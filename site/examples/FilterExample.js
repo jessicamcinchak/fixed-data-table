@@ -23,10 +23,10 @@ var FilterExample = React.createClass({
   },
 
   componentWillMount() {
-    this._filterRowsBy(this.state.filterBy);
+    this._filterFirstNamesBy(this.state.filterBy);
   },
 
-  _filterRowsBy(filterBy) {
+  _filterFirstNamesBy(filterBy) {
 
     var rows = this.state.rows.slice();        
     var filteredRows = filterBy ? rows.filter(function(row){
@@ -43,14 +43,16 @@ var FilterExample = React.createClass({
     return this.state.filteredRows[rowIndex];
   },
 
-  _onFilterChange(e) {
-    this._filterRowsBy(e.target.value);
+  _onFirstNameFilterChange(e) {
+    this._filterFirstNamesBy(e.target.value);
   },
   
-	render() {
-		return (
+  render() {
+    return (
       <div>
-        <input onChange={this._onFilterChange} placeholder='Filter by First Name' />
+        <input onChange={this._onFirstNameFilterChange} placeholder='Filter by First Name' />
+        @todo checkbox filter: only show 5-digit ZIPs
+        @todo select box dropdown filter: show A-M or N-Z last names
         <br />
         <Table 
           rowHeight={50}
@@ -98,7 +100,7 @@ var FilterExample = React.createClass({
         </Table>
       </div>
     )
-	},
+  },
 })
 
 module.exports = FilterExample;
