@@ -24,18 +24,31 @@ var FilterExample = React.createClass({
 
   componentWillMount() {
     this._filterFirstNamesBy(this.state.filterBy);
+    this._filterZipDigitsBy(this.state.filterBy);
   },
 
   _filterFirstNamesBy(filterBy) {
 
     var rows = this.state.rows.slice();        
-    var filteredRows = filterBy ? rows.filter(function(row){
-      return row['firstName'].toLowerCase().indexOf(filterBy.toLowerCase()) >= 0
+    var filteredRows = filterBy ? rows.filter(function(row) {
+      return row['firstName'].toLowerCase().indexOf(filterBy.toLowerCase()) >= 0;
     }) : rows;
 
     this.setState({
-      filteredRows,
-      filterBy,
+      filteredRows, //filteredRows is an array of objects
+      filterBy //filterBy is text input
+    })
+  },
+
+  _filterZipDigitsBy() {
+
+    var rows = this.state.rows.slice();
+    var filteredRows = rows.filter(function(row) {
+      return row['zipCode'].length < 6; //filters 5-digit zips, TODO attach to checkbox click event
+    });
+
+    this.setState({
+      filteredRows
     })
   },
 
@@ -46,13 +59,18 @@ var FilterExample = React.createClass({
   _onFirstNameFilterChange(e) {
     this._filterFirstNamesBy(e.target.value);
   },
+
+  _onZipDigitFilterChange(e) {
+    this._filterZipDigitsBy();
+  },
   
   render() {
     return (
       <div>
-        <input onChange={this._onFirstNameFilterChange} placeholder='Filter by First Name' />
-        @todo checkbox filter: only show 5-digit ZIPs
+        <input type='text' onChange={this._onFirstNameFilterChange} placeholder='Filter by First Name' />
+        <input type='checkbox' onChange={this._onZipDigitChange} value='Show only 5-digit Zip Codes' />
         @todo select box dropdown filter: show A-M or N-Z last names
+        
         <br />
         <Table 
           rowHeight={50}
