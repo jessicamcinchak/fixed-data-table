@@ -16,7 +16,7 @@ function renderImage(/*string*/ cellData) {
 var FilterExample = React.createClass({
   getInitialState() {
     return {
-      rows : new FakeObjectDataListStore().getAll(),
+      rows: new FakeObjectDataListStore().getAll(),
       filteredRows: null,
       filterBy: null
     };
@@ -32,7 +32,7 @@ var FilterExample = React.createClass({
 
     var rows = this.state.rows.slice();        
     var filteredRows = filterBy ? rows.filter(function(row) {
-      return row['firstName'].toLowerCase().indexOf(filterBy.toLowerCase()) >= 0;
+      return row['firstName'].toLowerCase().indexOf(filterBy.toLowerCase()) > -1;
     }) : rows;
 
     this.setState({
@@ -41,16 +41,19 @@ var FilterExample = React.createClass({
     })
   },
 
-  _filterLastNamesBy(filterBy) {
+  _filterLastNamesBy() {
+    
+    // var e = document.getElementById('lastNameSelect'); //evaluating to null
+    // var optionValues = e.options[0].value;
+    // console.log(optionValues);
 
     var rows = this.state.rows.slice();
-    var filteredRows = filterBy ? rows.filter(function(row) {
-      return row['lastName'].toLowerCase().indexOf(filterBy) > -1; //TODO fix filter. it changes, but not logically
-    }) : rows;
+    var filteredRows = rows.filter(function(row) {
+      return row['lastName'].toLowerCase().charAt(0).indexOf(/* option value string */) > -1;
+    });
 
     this.setState({
-      filteredRows,
-      filterBy //filterBy should be selected option value (string)
+      filteredRows
     })
   },
 
@@ -67,6 +70,7 @@ var FilterExample = React.createClass({
   },
 
   _rowGetter(rowIndex) {
+    //do intersection here? intersection takes arrays as arguments
     return this.state.filteredRows[rowIndex];
   },
 
@@ -74,11 +78,11 @@ var FilterExample = React.createClass({
     this._filterFirstNamesBy(e.target.value);
   },
 
-  _onLastNameFilterChange(e) {
+  _onLastNameFilterChange() {
     this._filterLastNamesBy();
   },
 
-  _onZipDigitFilterChange(e) {
+  _onZipDigitFilterChange() {
     this._filterZipDigitsBy();
   },
   
@@ -86,12 +90,12 @@ var FilterExample = React.createClass({
     return (
       <div>
         <input type='text' onChange={this._onFirstNameFilterChange} placeholder='Filter by First Name' />
-        <select onChange={this._onLastNameFilterChange}>
-          <option value='--'>Filter by Last Name</option>
-          <option value='a b c d e f g h i j k l m'>A to M</option>
-          <option value='n o p q r s t u v w x y z'>N to Z</option>
+        <select id='lastNameSelect' onChange={this._onLastNameFilterChange}>
+          <option value=''>Filter by Last Name</option>
+          <option value='abcdefghijklm'>A to M</option>
+          <option value='nopqrstuvwxyz'>N to Z</option>
         </select>
-        <input type='checkbox' onChange={this._onZipDigitChange}>Show only five digit Zip Codes</input>      
+        <input type='checkbox' onChange={this._onZipDigitFilterChange}>Show only five digit Zip Codes</input>      
         <br />
         <Table 
           rowHeight={50}
@@ -107,35 +111,34 @@ var FilterExample = React.createClass({
             dataKey='avartar'
             fixed={true}
             label=''
-            width={50}
-          />
+            width={50} />
+
           <Column
             dataKey='firstName'
             fixed={true}
             label='First Name'
-            width={100}
-          />
+            width={100} />
+          
           <Column
             dataKey='lastName'
             fixed={true}
             label='Last Name'
-            width={100}
-          />
+            width={100} />
+          
           <Column
             dataKey='city'
             label='City'
-            width={100}
-          />
+            width={100} />
+          
           <Column
             label='Street'
             width={200}
-            dataKey='street'
-          />
+            dataKey='street' />
+          
           <Column
             label='Zip Code'
             width={200}
-            dataKey='zipCode'
-          />
+            dataKey='zipCode' />
         </Table>
       </div>
     )
