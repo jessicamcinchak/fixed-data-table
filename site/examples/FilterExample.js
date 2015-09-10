@@ -24,7 +24,8 @@ var FilterExample = React.createClass({
 
   componentWillMount() {
     this._filterFirstNamesBy(this.state.filterBy);
-    this._filterZipDigitsBy(this.state.filterBy);
+    this._filterLastNamesBy(this.state.filterBy);
+    this._filterZipDigitsBy(this.state);
   },
 
   _filterFirstNamesBy(filterBy) {
@@ -37,6 +38,19 @@ var FilterExample = React.createClass({
     this.setState({
       filteredRows, //filteredRows is an array of objects
       filterBy //filterBy is text input
+    })
+  },
+
+  _filterLastNamesBy(filterBy) {
+
+    var rows = this.state.rows.slice();
+    var filteredRows = filterBy ? rows.filter(function(row) {
+      return row['lastName'].toLowerCase().indexOf(filterBy) > -1; //TODO fix filter. it changes, but not logically
+    }) : rows;
+
+    this.setState({
+      filteredRows,
+      filterBy //filterBy should be selected option value (string)
     })
   },
 
@@ -60,6 +74,10 @@ var FilterExample = React.createClass({
     this._filterFirstNamesBy(e.target.value);
   },
 
+  _onLastNameFilterChange(e) {
+    this._filterLastNamesBy();
+  },
+
   _onZipDigitFilterChange(e) {
     this._filterZipDigitsBy();
   },
@@ -68,9 +86,12 @@ var FilterExample = React.createClass({
     return (
       <div>
         <input type='text' onChange={this._onFirstNameFilterChange} placeholder='Filter by First Name' />
-        <input type='checkbox' onChange={this._onZipDigitChange} value='Show only 5-digit Zip Codes' />
-        @todo select box dropdown filter: show A-M or N-Z last names
-        
+        <select onChange={this._onLastNameFilterChange}>
+          <option value='--'>Filter by Last Name</option>
+          <option value='a b c d e f g h i j k l m'>A to M</option>
+          <option value='n o p q r s t u v w x y z'>N to Z</option>
+        </select>
+        <input type='checkbox' onChange={this._onZipDigitChange}>Show only five digit Zip Codes</input>      
         <br />
         <Table 
           rowHeight={50}
