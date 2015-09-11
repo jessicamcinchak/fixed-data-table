@@ -25,7 +25,7 @@ var FilterExample = React.createClass({
   componentWillMount() {
     this._filterFirstNamesBy(this.state.filterBy);
     this._filterLastNamesBy(this.state);
-    this._filterZipDigitsBy(this.state);
+    this._filterZipDigitsBy(this.state.filterBy);
   },
 
   _filterFirstNamesBy(filterBy) {
@@ -65,27 +65,16 @@ var FilterExample = React.createClass({
     })
   },
 
-  _filterZipDigitsBy() {
-
-    var c = document.getElementById('zipCheckbox');
-    console.log(c); //null, until first click
-    
-    // var rows = this.state.rows.slice();
-    // if (c.checked) {
-    //   var filteredRows = rows.filter(function(row) {
-    //     return row['zipCode'].length < 6;
-    //   });
-    // } else {
-    //   return rows;
-    // }
+  _filterZipDigitsBy(filterBy) {
 
     var rows = this.state.rows.slice();
-    var filteredRows = rows.filter(function(row) {
-      return row['zipCode'].length < 6; //filters 5-digit zips, TODO attach to checkbox click event
-    });
+    var filteredRows = filterBy ? rows.filter(function(row) {
+      return row['zipCode'].length < 6;
+    }) : rows;
 
     this.setState({
-      filteredRows
+      filteredRows,
+      filterBy
     })
   },
 
@@ -103,8 +92,13 @@ var FilterExample = React.createClass({
     this._filterLastNamesBy();
   },
 
-  _onZipDigitFilterChange() {
-    this._filterZipDigitsBy();
+  _onZipDigitFilterChange(c) {
+    var c = document.getElementById('zipCheckbox');
+
+    if (c.checked) {
+      this._filterZipDigitsBy(c.checked);
+      // console.log(this); // this is {object} - constructor.
+    }
   },
   
   render() {
