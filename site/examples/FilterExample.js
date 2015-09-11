@@ -68,10 +68,13 @@ var FilterExample = React.createClass({
   _filterZipDigitsBy() {
 
     var c = document.getElementById('zipCheckbox');
-    console.log(c); //null
+    console.log(c); //null, until first click
     
+    // var rows = this.state.rows.slice();
     // if (c.checked) {
-    //   /* var filteredRows... */
+    //   var filteredRows = rows.filter(function(row) {
+    //     return row['zipCode'].length < 6;
+    //   });
     // } else {
     //   return rows;
     // }
@@ -113,7 +116,7 @@ var FilterExample = React.createClass({
           <option value='abcdefghijklm'>A to M</option>
           <option value='nopqrstuvwxyz'>N to Z</option>
         </select>
-        <input type='checkbox' onChange={this._onZipDigitFilterChange}>Show only five digit Zip Codes</input>      
+        <input type='checkbox' id='zipCheckbox' onChange={this._onZipDigitFilterChange}>Show only five digit Zip Codes</input>      
         <br />
         <Table 
           rowHeight={50}
