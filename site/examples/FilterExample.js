@@ -24,7 +24,7 @@ var FilterExample = React.createClass({
 
   componentWillMount() {
     this._filterFirstNamesBy(this.state.filterBy);
-    this._filterLastNamesBy(this.state.filterBy);
+    this._filterLastNamesBy(this.state);
     this._filterZipDigitsBy(this.state);
   },
 
@@ -36,20 +36,28 @@ var FilterExample = React.createClass({
     }) : rows;
 
     this.setState({
-      filteredRows, //filteredRows is an array of objects
-      filterBy //filterBy is text input
+      filteredRows, //filteredRows is {array} - array of objects, objects are each row
+      filterBy //filterBy is {string} - text input
     })
   },
 
   _filterLastNamesBy() {
     
-    // var e = document.getElementById('lastNameSelect'); //evaluating to null
-    // var optionValues = e.options[0].value;
-    // console.log(optionValues);
+    // var e = document.getElementById('lastNameSelect'); //undefined??
+    // var optionAM = e.options[1].value; //should return string 'abc...'
+    // var optionNZ = e.options[2].value; //should return string 'nop...'
+    // console.log(e, optionAM, optionNZ);
 
     var rows = this.state.rows.slice();
     var filteredRows = rows.filter(function(row) {
-      return row['lastName'].toLowerCase().charAt(0).indexOf(/* option value string */) > -1;
+      // if (/* select = a-m */) {
+      //   return row['lastName'].toLowerCase().charAt(0).indexOf(optionAM) > -1;
+      // } else if (/* select = n-z */) {
+      //   return row['lastName'].toLowerCase().charAt(0).indexOf(optionNZ) > -1;
+      // } else {
+      //   return rows; //if dropdown is on default e.options[0], don't filter table rows
+      // }
+      return rows;
     });
 
     this.setState({
@@ -58,6 +66,15 @@ var FilterExample = React.createClass({
   },
 
   _filterZipDigitsBy() {
+
+    var c = document.getElementById('zipCheckbox');
+    console.log(c); //null
+    
+    // if (c.checked) {
+    //   /* var filteredRows... */
+    // } else {
+    //   return rows;
+    // }
 
     var rows = this.state.rows.slice();
     var filteredRows = rows.filter(function(row) {
@@ -70,7 +87,8 @@ var FilterExample = React.createClass({
   },
 
   _rowGetter(rowIndex) {
-    //do intersection here? intersection takes arrays as arguments
+    // rowGetter is a function which decides which rows are displayed, so use intersection here
+    // TODO add lodash to use: _.intersection([], [], []);
     return this.state.filteredRows[rowIndex];
   },
 
