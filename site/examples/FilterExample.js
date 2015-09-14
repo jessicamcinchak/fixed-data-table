@@ -13,6 +13,9 @@ function renderImage(/*string*/ cellData) {
   return <ExampleImage src={cellData} />;
 }
 
+/** 
+ * Top-level component
+ */
 var FilterExample = React.createClass({
   getInitialState() {
     return {
@@ -23,30 +26,11 @@ var FilterExample = React.createClass({
   },
 
   componentWillMount() {
-    this._filterFirstNamesBy(this.state.filterBy);
     this._filterLastNamesBy(this.state);
     this._filterZipDigitsBy(this.state.filterBy);
   },
 
-  _filterFirstNamesBy(filterBy) {
-
-    var rows = this.state.rows.slice();        
-    var filteredRows = filterBy ? rows.filter(function(row) {
-      return row['firstName'].toLowerCase().indexOf(filterBy.toLowerCase()) > -1;
-    }) : rows;
-
-    this.setState({
-      filteredRows, //filteredRows is {array} - array of objects, objects are each row
-      filterBy //filterBy is {string} - text input
-    })
-  },
-
   _filterLastNamesBy() {
-    
-    // var e = document.getElementById('lastNameSelect'); //undefined??
-    // var optionAM = e.options[1].value; //should return string 'abc...'
-    // var optionNZ = e.options[2].value; //should return string 'nop...'
-    // console.log(e, optionAM, optionNZ);
 
     var rows = this.state.rows.slice();
     var filteredRows = rows.filter(function(row) {
@@ -84,11 +68,12 @@ var FilterExample = React.createClass({
     return this.state.filteredRows[rowIndex];
   },
 
-  _onFirstNameFilterChange(e) {
-    this._filterFirstNamesBy(e.target.value);
-  },
-
   _onLastNameFilterChange() {
+    var e = document.getElementById('lastNameSelect');
+    var optionAM = e.options[1].value; //returns string 'abc...'
+    var optionNZ = e.options[2].value; //returns string 'nop...'
+    // console.log(e, optionAM, optionNZ);
+
     this._filterLastNamesBy();
   },
 
@@ -104,7 +89,7 @@ var FilterExample = React.createClass({
   render() {
     return (
       <div>
-        <input type='text' onChange={this._onFirstNameFilterChange} placeholder='Filter by First Name' />
+        <FirstNameFilter />
         <select id='lastNameSelect' onChange={this._onLastNameFilterChange}>
           <option value=''>Filter by Last Name</option>
           <option value='abcdefghijklm'>A to M</option>
@@ -158,6 +143,44 @@ var FilterExample = React.createClass({
       </div>
     )
   },
+})
+
+/** 
+ * Child component
+ */
+var FirstNameFilter = React.createClass({
+  getInitialState() {
+    return {
+      rows: new FakeObjectDataListStore().getAll(),
+      filteredRows: null,
+      filterBy: null
+    };
+  },
+
+  componentWillMount() {
+    this._filterFirstNamesBy(this.state.filterBy);
+  },
+
+  _filterFirstNamesBy(filterBy) {
+
+    var rows = this.state.rows.slice();        
+    var filteredRows = filterBy ? rows.filter(function(row) {
+      return row['firstName'].toLowerCase().indexOf(filterBy.toLowerCase()) > -1;
+    }) : rows;
+
+    this.setState({
+      filteredRows, //filteredRows is {array} - array of objects, objects are each row
+      filterBy //filterBy is {string} - text input
+    })
+  },
+
+  _onFirstNameFilterChange(e) {
+    this._filterFirstNamesBy(e.target.value);
+  },
+
+  render() {
+    return <input type='text' onChange={this._onFirstNameFilterChange} placeholder='Filter by First Name' />;
+  }
 })
 
 module.exports = FilterExample;
