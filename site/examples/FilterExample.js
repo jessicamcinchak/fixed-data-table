@@ -18,10 +18,10 @@ var FilterExample = React.createClass({
   getInitialState() {
     return {
       rows: new FakeObjectDataListStore().getAll(),
-      filteredRows: null, //intersection of all filtered rows, or all rows if no filters
-      firstNameRows: null, //first name filtered rows only
-      lastNameRows: null, //last name filtered rows only
-      zipRows: null, //zip filtered rows
+      filteredRows: null, //intersection of all filtered rows, or all rows if no column filters
+      firstNameRows: null,
+      lastNameRows: null,
+      zipRows: null,
       filterBy: null, //first name search input
       checkbox: null, //boolean status of zip filter
     };
@@ -31,13 +31,13 @@ var FilterExample = React.createClass({
     this._filterFirstNamesBy(this.state.filterBy);
     this._filterLastNamesBy(this.state);
     this._filterZipsBy(this.state.checkbox);
-    this._findIntersection(this.state); //needed to draw all table rows first time
+    this._findIntersection(this.state); //draws all table rows first time
   },
 
-  componentDidMount() {
-    this._findIntersection(this.state); //try to trigger again, not working.
-  },
-
+  /** 
+   * @param {string} filterBy - text input
+   * @returns {array} firstNameRows - filtered column rows
+   */
   _filterFirstNamesBy(filterBy) {
 
     var rows = this.state.rows.slice();      
@@ -46,13 +46,16 @@ var FilterExample = React.createClass({
     }) : rows;
 
     this.setState({
-      firstNameRows, //firstNameRows is {array} - array of objects, objects are each row
-      filterBy //filterBy is {string} - text input
+      firstNameRows,
+      filterBy
     })
 
     // console.log(firstNameRows, filterBy);
   },
 
+  /** 
+   * @todo
+   */
   _filterLastNamesBy() {
 
     var rows = this.state.rows.slice();
@@ -65,6 +68,10 @@ var FilterExample = React.createClass({
     })
   },
 
+  /**
+   * @param {boolean} checkbox - true if checked
+   * @returns {array} zipRows - filtered column rows
+   */
   _filterZipsBy(checkbox) {
 
     var rows = this.state.rows.slice();
@@ -73,14 +80,17 @@ var FilterExample = React.createClass({
     }) : rows;
 
     this.setState({
-      zipRows, //zipRows is {array}
-      checkbox //checkbox is {boolean} - true if checked
+      zipRows,
+      checkbox
     })
 
     // console.log(zipRows, checkbox);
   },
 
-  // @todo - trigger this event again after any of the above filters have changed
+  /** 
+   * @todo - trigger this event again after any of the above filters have changed
+   * read about lifecycles https://facebook.github.io/react/docs/working-with-the-browser.html 
+   */
   _findIntersection() {
     
     var rows = this.state.rows,
@@ -108,9 +118,9 @@ var FilterExample = React.createClass({
 
   _onLastNameFilterChange() {
     var e = document.getElementById('lastNameSelect');
-    var optionAM = e.options[1].value; //returns string 'abc...'. later, do 'row['lastName'].toLowerCase().charAt(0).indexOf(optionAM) > -1'
-    var optionNZ = e.options[2].value; //returns string 'nop...'
-    // console.log(e, optionAM, optionNZ);
+    
+    var optionAM = e.options[1].value; //returns string 'abc...'. later, check 'row['lastName'].toLowerCase().charAt(0).indexOf(optionAM) > -1'
+    var optionNZ = e.options[2].value;
 
     this._filterLastNamesBy();
   },
@@ -120,7 +130,6 @@ var FilterExample = React.createClass({
 
     if (c.checked) {
       this._filterZipsBy(c.checked);
-      // console.log(this); // this is {object} - constructor.
     }
   },
   
