@@ -4,6 +4,7 @@ var ExampleImage = require('./ExampleImage');
 var FakeObjectDataListStore = require('./FakeObjectDataListStore');
 var FixedDataTable = require('fixed-data-table');
 var React = require('react');
+var _ = require('lodash');
 
 var Column = FixedDataTable.Column;
 var PropTypes = React.PropTypes;
@@ -13,64 +14,101 @@ function renderImage(/*string*/ cellData) {
   return <ExampleImage src={cellData} />;
 }
 
-/** 
- * Top-level component
- */
 var FilterExample = React.createClass({
   getInitialState() {
     return {
       rows: new FakeObjectDataListStore().getAll(),
-      filteredRows: null,
-      filterBy: null
+      filteredRows: null, //intersection of all filtered rows, or all rows if no filters
+      firstNameRows: null, //first name filtered rows only
+      lastNameRows: null, //last name filtered rows only
+      zipRows: null, //zip filtered rows
+      filterBy: null, //first name search input
+      checkbox: null, //boolean status of zip filter
     };
   },
 
   componentWillMount() {
+    this._filterFirstNamesBy(this.state.filterBy);
     this._filterLastNamesBy(this.state);
-    this._filterZipDigitsBy(this.state.filterBy);
+    this._filterZipsBy(this.state.checkbox);
+    this._findIntersection(this.state); //needed to draw all table rows first time
+  },
+
+  componentDidMount() {
+    this._findIntersection(this.state); //try to trigger again, not working.
+  },
+
+  _filterFirstNamesBy(filterBy) {
+
+    var rows = this.state.rows.slice();      
+    var firstNameRows = filterBy ? rows.filter(function(row) {
+      return row['firstName'].toLowerCase().indexOf(filterBy.toLowerCase()) > -1;
+    }) : rows;
+
+    this.setState({
+      firstNameRows, //firstNameRows is {array} - array of objects, objects are each row
+      filterBy //filterBy is {string} - text input
+    })
+
+    // console.log(firstNameRows, filterBy);
   },
 
   _filterLastNamesBy() {
 
     var rows = this.state.rows.slice();
-    var filteredRows = rows.filter(function(row) {
-      // if (/* select = a-m */) {
-      //   return row['lastName'].toLowerCase().charAt(0).indexOf(optionAM) > -1;
-      // } else if (/* select = n-z */) {
-      //   return row['lastName'].toLowerCase().charAt(0).indexOf(optionNZ) > -1;
-      // } else {
-      //   return rows; //if dropdown is on default e.options[0], don't filter table rows
-      // }
+    var lastNameRows = rows.filter(function(row) {
       return rows;
     });
+
+    this.setState({
+      lastNameRows
+    })
+  },
+
+  _filterZipsBy(checkbox) {
+
+    var rows = this.state.rows.slice();
+    var zipRows = checkbox ? rows.filter(function(row) {
+      return row['zipCode'].length < 6;
+    }) : rows;
+
+    this.setState({
+      zipRows, //zipRows is {array}
+      checkbox //checkbox is {boolean} - true if checked
+    })
+
+    // console.log(zipRows, checkbox);
+  },
+
+  // @todo - trigger this event again after any of the above filters have changed
+  _findIntersection() {
+    
+    var rows = this.state.rows,
+        firstNameRows = this.state.firstNameRows,
+        lastNameRows = this.state.lastNameRows,
+        zipRows = this.state.zipRows;
+
+    var filteredRows = (firstNameRows || lastNameRows || zipRows) ? rows.filter(function(row) {
+      return _.intersection(firstNameRows, lastNameRows, zipRows);
+    }) : rows;
 
     this.setState({
       filteredRows
     })
   },
 
-  _filterZipDigitsBy(filterBy) {
-
-    var rows = this.state.rows.slice();
-    var filteredRows = filterBy ? rows.filter(function(row) {
-      return row['zipCode'].length < 6;
-    }) : rows;
-
-    this.setState({
-      filteredRows,
-      filterBy
-    })
+  /** Gets rows to be displayed */
+  _rowGetter(rowIndex) {
+    return this.state.filteredRows[rowIndex];
   },
 
-  _rowGetter(rowIndex) {
-    // rowGetter is a function which decides which rows are displayed, so use intersection here
-    // TODO add lodash to use: _.intersection([], [], []);
-    return this.state.filteredRows[rowIndex];
+  _onFirstNameFilterChange(e) {
+    this._filterFirstNamesBy(e.target.value);
   },
 
   _onLastNameFilterChange() {
     var e = document.getElementById('lastNameSelect');
-    var optionAM = e.options[1].value; //returns string 'abc...'
+    var optionAM = e.options[1].value; //returns string 'abc...'. later, do 'row['lastName'].toLowerCase().charAt(0).indexOf(optionAM) > -1'
     var optionNZ = e.options[2].value; //returns string 'nop...'
     // console.log(e, optionAM, optionNZ);
 
@@ -81,7 +119,7 @@ var FilterExample = React.createClass({
     var c = document.getElementById('zipCheckbox');
 
     if (c.checked) {
-      this._filterZipDigitsBy(c.checked);
+      this._filterZipsBy(c.checked);
       // console.log(this); // this is {object} - constructor.
     }
   },
@@ -89,7 +127,7 @@ var FilterExample = React.createClass({
   render() {
     return (
       <div>
-        <FirstNameFilter />
+        <input type='text' onChange={this._onFirstNameFilterChange} placeholder='Filter by First Name' />
         <select id='lastNameSelect' onChange={this._onLastNameFilterChange}>
           <option value=''>Filter by Last Name</option>
           <option value='abcdefghijklm'>A to M</option>
@@ -143,44 +181,6 @@ var FilterExample = React.createClass({
       </div>
     )
   },
-})
-
-/** 
- * Child component
- */
-var FirstNameFilter = React.createClass({
-  getInitialState() {
-    return {
-      rows: new FakeObjectDataListStore().getAll(),
-      filteredRows: null,
-      filterBy: null
-    };
-  },
-
-  componentWillMount() {
-    this._filterFirstNamesBy(this.state.filterBy);
-  },
-
-  _filterFirstNamesBy(filterBy) {
-
-    var rows = this.state.rows.slice();        
-    var filteredRows = filterBy ? rows.filter(function(row) {
-      return row['firstName'].toLowerCase().indexOf(filterBy.toLowerCase()) > -1;
-    }) : rows;
-
-    this.setState({
-      filteredRows, //filteredRows is {array} - array of objects, objects are each row
-      filterBy //filterBy is {string} - text input
-    })
-  },
-
-  _onFirstNameFilterChange(e) {
-    this._filterFirstNamesBy(e.target.value);
-  },
-
-  render() {
-    return <input type='text' onChange={this._onFirstNameFilterChange} placeholder='Filter by First Name' />;
-  }
 })
 
 module.exports = FilterExample;
