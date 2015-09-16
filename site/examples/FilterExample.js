@@ -37,6 +37,7 @@ var FilterExample = React.createClass({
   /** 
    * @param {string} filterBy - text input
    * @returns {array} firstNameRows - filtered column rows
+   * @returns {array} filteredRows - intersection of all filter sets
    */
   _filterFirstNamesBy(filterBy) {
 
@@ -46,11 +47,10 @@ var FilterExample = React.createClass({
     }) : rows;
 
     this.setState({
-      firstNameRows,
-      filterBy
-    })
-
-    // console.log(firstNameRows, filterBy);
+      firstNameRows
+    }, () => {
+      this._findIntersection();
+    });
   },
 
   /** 
@@ -65,12 +65,15 @@ var FilterExample = React.createClass({
 
     this.setState({
       lastNameRows
-    })
+    }, () => {
+      this._findIntersection();
+    });
   },
 
   /**
    * @param {boolean} checkbox - true if checked
    * @returns {array} zipRows - filtered column rows
+   * @returns {array} filteredRows - intersection of all filter sets
    */
   _filterZipsBy(checkbox) {
 
@@ -80,16 +83,15 @@ var FilterExample = React.createClass({
     }) : rows;
 
     this.setState({
-      zipRows,
-      checkbox
-    })
-
-    // console.log(zipRows, checkbox);
+      zipRows
+    }, () => {
+      this._findIntersection();
+    });
   },
 
   /** 
-   * @todo - trigger this event again after any of the above filters have changed
-   * read about lifecycles https://facebook.github.io/react/docs/working-with-the-browser.html 
+   * Finds the intersection of each set of filtered rows
+   * @returns {array} filteredRows
    */
   _findIntersection() {
     
@@ -98,13 +100,16 @@ var FilterExample = React.createClass({
         lastNameRows = this.state.lastNameRows,
         zipRows = this.state.zipRows;
 
-    var filteredRows = (firstNameRows || lastNameRows || zipRows) ? rows.filter(function(row) {
-      return _.intersection(firstNameRows, lastNameRows, zipRows);
-    }) : rows;
+    var filteredRows = (firstNameRows || lastNameRows || zipRows) ? _.intersection(firstNameRows, lastNameRows, zipRows) : rows;
 
     this.setState({
       filteredRows
-    })
+    });
+  },
+
+  /** @todo abstract */
+  _setStateAndFindIntersection(setStateName, setStateValue) {
+    
   },
 
   /** Gets rows to be displayed */
