@@ -18,13 +18,10 @@ var FilterExample = React.createClass({
   getInitialState() {
     return {
       rows: new FakeObjectDataListStore().getAll(),
-      filteredRows: null, //intersection of all filtered rows, or all rows if no column filters
+      filteredRows: null, //intersection of all filtered columns, or all rows if no filters
       firstNameRows: null,
       lastNameRows: null,
-      zipRows: null,
-      filterBy: null, //first name search input
-      option: null, //last name option dropdown
-      checkbox: null, //boolean status of zip filter
+      zipRows: null
     };
   },
 
@@ -32,7 +29,7 @@ var FilterExample = React.createClass({
     this._filterFirstNamesBy(this.state.filterBy);
     this._filterLastNamesBy(this.state.option);
     this._filterZipsBy(this.state.checkbox);
-    this._findIntersection(this.state); //draws all table rows first time
+    this._findIntersection(this.state); //draws all rows first time
   },
 
   /** 
@@ -52,6 +49,9 @@ var FilterExample = React.createClass({
     }, () => {
       this._findIntersection();
     });
+
+    // console.log(this.state);
+    // _setStateAndFindIntersection(this.state.firstNameRows);
   },
 
   /** 
@@ -65,7 +65,6 @@ var FilterExample = React.createClass({
     var lastNameRows = option ? rows.filter(function(row) {
       return row['lastName'].toLowerCase().charAt(0).indexOf(option) > -1;
     }) : rows;
-    
     // debugger;
     // console.log(option, lastNameRows);
 
@@ -114,8 +113,10 @@ var FilterExample = React.createClass({
   },
 
   /** @todo abstract */
-  _setStateAndFindIntersection(setStateName, setStateValue) {
-    
+  _setStateAndFindIntersection(setStateObject) {
+    this.setState({ setStateObject }, () => {
+      this._findIntersection();
+    });
   },
 
   /** Gets rows to be displayed */
@@ -127,9 +128,9 @@ var FilterExample = React.createClass({
     this._filterFirstNamesBy(e.target.value);
   },
 
-  _onLastNameFilterChange() {
-    var e = document.getElementById('lastNameSelect');
-    var selectedOption = e.options[e.selectedIndex].value;
+  _onLastNameFilterChange(o) {
+    var o = document.getElementById('lastNameSelect');
+    var selectedOption = o.options[o.selectedIndex].value;
     
     if (selectedOption == "abcdefghijklm" || selectedOption == "nopqrstuvwxyz") {
       this._filterLastNamesBy(selectedOption);
