@@ -23,13 +23,14 @@ var FilterExample = React.createClass({
       lastNameRows: null,
       zipRows: null,
       filterBy: null, //first name search input
+      option: null, //last name option dropdown
       checkbox: null, //boolean status of zip filter
     };
   },
 
   componentWillMount() {
     this._filterFirstNamesBy(this.state.filterBy);
-    this._filterLastNamesBy(this.state);
+    this._filterLastNamesBy(this.state.option);
     this._filterZipsBy(this.state.checkbox);
     this._findIntersection(this.state); //draws all table rows first time
   },
@@ -54,14 +55,19 @@ var FilterExample = React.createClass({
   },
 
   /** 
-   * @todo
+   * @param {string} option - value of first or second option in dropdown
+   * @returns {array} lastNameRows - filtered column rows
+   * @returns {array} filteredRows - intersection of all filter sets
    */
-  _filterLastNamesBy() {
+  _filterLastNamesBy(option) {
 
     var rows = this.state.rows.slice();
-    var lastNameRows = rows.filter(function(row) {
-      return rows;
-    });
+    var lastNameRows = option ? rows.filter(function(row) {
+      return row['lastName'].toLowerCase().charAt(0).indexOf(option) > -1;
+    }) : rows;
+    
+    // debugger;
+    // console.log(option, lastNameRows);
 
     this.setState({
       lastNameRows
@@ -123,11 +129,11 @@ var FilterExample = React.createClass({
 
   _onLastNameFilterChange() {
     var e = document.getElementById('lastNameSelect');
+    var selectedOption = e.options[e.selectedIndex].value;
     
-    var optionAM = e.options[1].value; //returns string 'abc...'. later, check 'row['lastName'].toLowerCase().charAt(0).indexOf(optionAM) > -1'
-    var optionNZ = e.options[2].value;
-
-    this._filterLastNamesBy();
+    if (selectedOption == "abcdefghijklm" || selectedOption == "nopqrstuvwxyz") {
+      this._filterLastNamesBy(selectedOption);
+    }
   },
 
   _onZipDigitFilterChange(c) {
