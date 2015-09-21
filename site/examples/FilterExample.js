@@ -49,9 +49,6 @@ var FilterExample = React.createClass({
     }, () => {
       this._findIntersection();
     });
-
-    // console.log(this.state);
-    // _setStateAndFindIntersection(this.state.firstNameRows);
   },
 
   /** 
@@ -112,9 +109,7 @@ var FilterExample = React.createClass({
 
   /** @todo abstract */
   _setStateAndFindIntersection(setStateObject) {
-    this.setState({ setStateObject }, () => {
-      this._findIntersection();
-    });
+    
   },
 
   /** Gets rows to be displayed */
