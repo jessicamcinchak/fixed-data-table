@@ -63,10 +63,8 @@ var FilterExample = React.createClass({
 
     var rows = this.state.rows.slice();
     var lastNameRows = option ? rows.filter(function(row) {
-      return row['lastName'].toLowerCase().charAt(0).indexOf(option) > -1;
+      return option.indexOf(row['lastName'].toLowerCase().charAt(0)) > -1;
     }) : rows;
-    // debugger;
-    // console.log(option, lastNameRows);
 
     this.setState({
       lastNameRows
