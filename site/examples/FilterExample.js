@@ -125,17 +125,14 @@ var FilterExample = React.createClass({
     var o = document.getElementById('lastNameSelect');
     var selectedOption = o.options[o.selectedIndex].value;
     
-    if (selectedOption == "abcdefghijklm" || selectedOption == "nopqrstuvwxyz") {
+    if (selectedOption !== null) {
       this._filterLastNamesBy(selectedOption);
     }
   },
 
   _onZipDigitFilterChange(c) {
     var c = document.getElementById('zipCheckbox');
-
-    if (c.checked) {
-      this._filterZipsBy(c.checked);
-    }
+    this._filterZipsBy(c.checked);
   },
   
   render() {
@@ -143,7 +140,7 @@ var FilterExample = React.createClass({
       <div>
         <input type='text' onChange={this._onFirstNameFilterChange} placeholder='Filter by First Name' />
         <select id='lastNameSelect' onChange={this._onLastNameFilterChange}>
-          <option value=''>Filter by Last Name</option>
+          <option value='abcdefghijklmnopqrstuvwxyz'>Filter by Last Name</option>
           <option value='abcdefghijklm'>A to M</option>
           <option value='nopqrstuvwxyz'>N to Z</option>
         </select>
